@@ -1,0 +1,54 @@
+* {
+  box-sizing: border-box; }
+
+#app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0; }
+
+#layout {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc; }
+
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: red;
+  bottom: auto;
+  height: 20%; }
+
+footer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: blue;
+  top: auto;
+  height: 20%; }
+
+.hidden {
+  display: none; }
+
+#thneeds, #settings {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 20%;
+  bottom: 20%; }
+
+#settings label {
+  display: inline-block;
+  width: 30%;
+  margin-right: 20px; }

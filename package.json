@@ -1,0 +1,8 @@
+{
+  "name": "thneeds.musicartscience.com.au",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "../node_modules/.bin/gulp"
+  }
+}

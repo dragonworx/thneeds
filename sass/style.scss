@@ -1,0 +1,47 @@
+@import 'variables';
+@import 'mixins';
+
+* {
+  box-sizing: border-box;
+}
+
+#app {
+  @include fill();
+}
+
+#layout {
+  @include fill();
+  background-color: #ccc;
+}
+
+header {
+  @include fill();
+  background-color: red;
+  bottom: auto;
+  height: $header-footer-size;
+}
+
+footer {
+  @include fill();
+  background-color: blue;
+  top: auto;
+  height: $header-footer-size;
+}
+
+.hidden {
+  display: none;
+}
+
+#thneeds, #settings {
+  @include fill();
+  top: $header-footer-size;
+  bottom: $header-footer-size;
+}
+
+#settings {
+  label {
+    display: inline-block;
+    width: 30%;
+    margin-right: 20px;
+  }
+}
