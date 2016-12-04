@@ -12,3 +12,17 @@
   right: 0;
   bottom: 0;
 }
+
+@mixin screen() {
+  @include fill();
+  top: $header-footer-size;
+  bottom: $header-footer-size;
+}
+
+@mixin dialog($width, $height) {
+  position: absolute;
+  top: $height;
+  left: $width;
+  right: $width;
+  bottom: $height;
+}

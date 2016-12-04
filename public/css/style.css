@@ -6,7 +6,8 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0; }
+  bottom: 0;
+  color: #e2e2e2; }
 
 #layout {
   position: absolute;
@@ -16,13 +17,16 @@
   bottom: 0;
   background-color: #ccc; }
 
+#spinner {
+  color: #fff; }
+
 header {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: red;
+  background-color: #a9a8ac;
   bottom: auto;
   height: 20%; }
 
@@ -32,14 +36,14 @@ footer {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: blue;
+  background-color: #5c545a;
   top: auto;
   height: 20%; }
 
 .hidden {
   display: none; }
 
-#thneeds, #settings {
+#thneeds, #settings, #editThneed {
   position: absolute;
   top: 0;
   left: 0;
@@ -52,3 +56,43 @@ footer {
   display: inline-block;
   width: 30%;
   margin-right: 20px; }
+
+.thneed {
+  height: 50px; }
+
+#overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); }
+
+#labelEdit {
+  display: inline-block;
+  width: 50px;
+  height: 50px; }
+
+#labelPicker {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  right: 20%;
+  bottom: 10%;
+  border: 1px solid black;
+  background-color: #000;
+  overflow: auto; }
+  #labelPicker .label {
+    height: 10%; }
+
+.default {
+  background-color: #2C2C2C; }
+
+.red {
+  background-color: #a31319; }
+
+.green {
+  background-color: #54a540; }
+
+.blue {
+  background-color: #12208a; }

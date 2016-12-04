@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Store from './store-lib'
 import App from './jsx/App.jsx'
-import axios from 'axios'
+import './actions'
 
 const store = Store.create({
   user: {
@@ -18,14 +18,35 @@ const store = Store.create({
     description: null,
     amount: null
   },
+  thneeds: [],
+  editThneed: {
+    isNew: false,
+    thneed: null
+  },
   settings: null,
-  route: 'settings'
+  route: 'thneeds',
+  ui: {
+    showOverlay: false,
+    isLoading: false,
+    showLabelPicker: false,
+    saveSortChanges: false
+  }
 });
 
-window.Store = Store;
+store.log((e) => {
+  console.log(e);
+});
 
-axios.get('/api/init').then(res => {
-  store.set('settings', res.data[0]);
-  ReactDOM.render(<App />, document.getElementById('main'));
-  setTimeout(() => store.set('route', 'thneeds'), 2000);
+window.store = store;
+
+ReactDOM.render(<App />, document.getElementById('main'));
+
+store.do('getJSON', '/api/init').then(res => {
+  store.set({
+    'settings': res.data.settings,
+    'thneeds': res.data.thneeds
+  });
+}).catch(err => {
+  // TODO: handle network error...
+  console.error(err.stack);
 });

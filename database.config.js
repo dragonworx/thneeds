@@ -21,10 +21,22 @@ module.exports = {
         },
         amount: {
           type: SQL.DECIMAL(10, 2),
-          defaultValue: 0
+          defaultValue: 0,
+          validate: {
+            isDecimal: true
+          }
         },
-        user: {
+        userId: {
           type: SQL.INTEGER
+        },
+        purchased: {
+          type: SQL.DATEONLY,
+          defaultValue: null,
+          allowNull: true
+        },
+        label: {
+          type: SQL.TEXT,
+          defaultValue: 'default'
         }
       },
       options: {
@@ -35,7 +47,10 @@ module.exports = {
       columns: {
         budgetAmount: {
           type: SQL.DECIMAL(10, 2),
-          defaultValue: 300
+          defaultValue: 300,
+          validate: {
+            isDecimal: true
+          }
         },
         budgetFrequency: {
           type: SQL.TEXT,
@@ -46,7 +61,13 @@ module.exports = {
         },
         accountAmount: {
           type: SQL.DECIMAL(10, 2),
-          defaultValue: 0
+          defaultValue: 0,
+          validate: {
+            isDecimal: true
+          }
+        },
+        sortOrder: {
+          type: SQL.JSON
         }
       },
       options: {

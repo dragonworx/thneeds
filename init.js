@@ -1,7 +1,7 @@
 const database = require('./database');
 const log = require('./log');
 
-database.init('postgres://postgres:admin@localhost:5433/postgres').then((tables) => {
+database.init('postgres://postgres:admin@localhost:5433/postgres', {force:true}).then((tables) => {
   log.begin('Creating default users...');
   tables.user.bulkCreate([
     { name: 'ali', password: 'snerf', isAdmin: true },
@@ -14,9 +14,9 @@ database.init('postgres://postgres:admin@localhost:5433/postgres').then((tables)
   }).then(() => {
     log.begin('Creating default settings...');
     return tables.settings.create({
-
+      sortOrder: []
     });
   }).then(() => {
-    log.completed('Database init completed.');
+    log.completed('Database init completed. Please wait while database finalises sync...');
   });
 });

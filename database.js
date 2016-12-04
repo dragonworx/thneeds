@@ -1,10 +1,12 @@
 const SQL = require('sequelize');
-const config = require('./database.config');
-const log = require('./log')
+const log = require('./log');
+let config = require('./database.config');
 
 module.exports = {
   tables: {},
-  init: function (connectionUrl = process.env.PG) {
+  init: function (connectionUrl = process.env.PG, configOveride = {}) {
+    config = Object.assign(config, configOveride);
+
     log.begin('Initialising database connection...');
 
     let db = new SQL(connectionUrl, {

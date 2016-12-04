@@ -1,6 +1,18 @@
 import React from 'react'
 
 let instance = null;
+let readyHandlers = [];
+let stateId = 0;
+const storeHelperAccessors = ['set', 'get', 'add', 'remove', 'clear', 'count', 'at', 'indexOf', 'contains', 'first', 'last', 'has', 'update', 'do'];
+const storeSetters = ['add', 'remove', 'clear'];
+
+function isObject(o) {
+  return typeof o === 'object' && o !== null && !Array.isArray(o);
+}
+
+function dispatchReady() {
+  readyHandlers.forEach(fn => fn(instance));
+}
 
 class Store {
   constructor(defaultState) {
@@ -8,8 +20,12 @@ class Store {
       throw new Error('Store is a Singleton, an instance already exists.');
     }
     instance = this;
-    this.state = defaultState;
     this.listeners = new Map;
+    this.loggers = [];
+    this.enableDispatch = true;
+    this.state = defaultState;
+    this.actions = {};
+    dispatchReady();
   }
 
   on(path, fn) {
@@ -17,42 +33,102 @@ class Store {
       this.listeners.set(path, []);
     }
     this.listeners.get(path).push(fn);
+    return this;
+  }
+
+  log(fn) {
+    this.loggers.push(fn);
+    return this;
   }
 
   dispatch(path, info) {
     try {
-      let listeners = this.listeners;
-      if (listeners.has('*')) {
-        listeners.get('*').forEach(fn => fn(info));
+      const l = this.loggers.length;
+      for (let i = 0; i < l; i++) {
+        this.loggers[i](info);
       }
       for (let [listenerPath, array] of this.listeners.entries()) {
-        if (listenerPath !== '*' && path.indexOf(listenerPath) === 0) {
+        if (path.indexOf(listenerPath) === 0) {
           array.forEach(fn => fn(info));
         }
       }
     } catch (e) {
       console.error(e.stack);
     }
+    return this;
+  }
+
+  update(path) {
+    this.mute(() => this.set(path, this.get(path)));
+    this.dispatch(path, {type: 'update', path: path});
+  }
+
+  mute(fn) {
+    this.enableDispatch = false;
+    fn();
+    this.enableDispatch = true;
+    return this;
+  }
+
+  set(pathKeyOrObject, value) {
+    if (isObject(pathKeyOrObject)) {
+      // object as batch key value based
+      let key, path, operation;
+      let dispatch = [];
+      this.mute(() => {
+        for (key in pathKeyOrObject) {
+          if (pathKeyOrObject.hasOwnProperty(key)) {
+            path = key;
+            operation = 'set';
+            const l = storeSetters.length;
+            for (let i = 0; i < l; i++) {
+              let setter = storeSetters[i];
+              if (path.indexOf(setter + ':') === 0) {
+                // helper setter (add:, remove: etc..)
+                path = path.substr(setter.length + 1);
+                operation = setter;
+              }
+            }
+            this[operation](path, pathKeyOrObject[key]);
+            dispatch.push({type: operation, path: path, value: pathKeyOrObject[key]});
+          }
+        }
+      });
+      let l = dispatch.length, d;
+      for (let i = 0; i < l; i++) {
+        d = dispatch[i];
+        this.dispatch(d.path, d);
+      }
+    } else {
+      // string key value
+      let path = pathKeyOrObject;
+      let ref = typeof value === 'function' ? this.actions : this.state;
+      let valueRef = value;
+      let steps = path.split('.');
+      let l = steps.length - 1;
+      for (let i = 0; i < l; i++) {
+        ref = ref[steps[i]];
+        valueRef = valueRef[steps[i]];
+        if (typeof ref === 'undefined' && isObject(valueRef)) {
+          debugger;
+        }
+      }
+      ref[steps[l]] = value;
+      if (this.enableDispatch) {
+        this.dispatch(path, {type: 'set', path: path, value: value});
+      }
+    }
+    return this;
   }
 
   get(path) {
     let steps = path.split('.');
-    let ref = this.state;
-    for (let i = 0; i < steps.length; i++) {
-      ref = ref[steps[i]];
-    }
-    return ref;
-  }
-
-  set(path, value) {
-    let steps = path.split('.');
-    let l = steps.length - 1;
+    let l = steps.length;
     let ref = this.state;
     for (let i = 0; i < l; i++) {
       ref = ref[steps[i]];
     }
-    ref[steps[l]] = value;
-    this.dispatch(path, {type: 'set', path: path, value: value});
+    return ref;
   }
 
   add(arrayPath, item) {
@@ -62,6 +138,7 @@ class Store {
     }
     array.push(item);
     this.dispatch(arrayPath, {type: 'add', path: arrayPath, value: item});
+    return this;
   }
 
   remove(arrayPath, item) {
@@ -75,26 +152,59 @@ class Store {
     }
     array.splice(index, 1);
     this.dispatch(arrayPath, {type: 'remove', path: arrayPath, value: item});
+    return this;
   }
 
-  update(path) {
-    this.dispatch(path, {type: 'update', path: path, value: this.get(path)});
+  clear(path) {
+    let value = this.get(path);
+    if (Array.isArray(value)) {
+      value.length = 0;
+    } else {
+      this.mute(() => {
+        this.set(path, undefined);
+      });
+    }
+    this.dispatch(path, {type: 'clear', path: path});
+    return this;
   }
 
   count(iterablePath) {
-    return Object.keys(this.get(iterablePath)).length;
+    const value = this.get(iterablePath);
+    if (Array.isArray(value)) {
+      return value.length;
+    } else if (isObject(value)) {
+      return Object.keys(value).length;
+    }
+    throw new Error(`Non-iterable path "${iterablePath}"`);
+  }
+
+  at(iterablePath, index) {
+    let value = this.get(iterablePath);
+    if (Array.isArray(value)) {
+      return value[index];
+    } else if (isObject(value)) {
+      let keys = Object.keys(value);
+      return value[keys[index]];
+    }
+    throw new Error(`Non-iterable path "${iterablePath}"`);
+  }
+
+  indexOf(iterablePath, item) {
+    const value = this.get(iterablePath);
+    if (Array.isArray(value)) {
+      return value.indexOf(item);
+    }
+    throw new Error(`Cannot find indexOf non-array value at path "${iterablePath}"`);
+  }
+
+  contains(iterablePath, item) {
+    return this.indexOf(iterablePath, item) > -1;
   }
 
   first(iterablePath) {
     let value = this.get(iterablePath);
     let keys = Object.keys(value);
     return value[keys[0]];
-  }
-
-  at(iterablePath, index) {
-    let value = this.get(iterablePath);
-    let keys = Object.keys(value);
-    return value[keys[index]];
   }
 
   last(iterablePath) {
@@ -108,28 +218,79 @@ class Store {
     return value !== null || typeof value !== 'undefined';
   }
 
+  do(invokablePath, ...args) {
+    let fn = this.actions[invokablePath];
+    let output = fn.apply(this, args);
+    this.dispatch(invokablePath, {type: 'do', path: invokablePath, args: args});
+    return output;
+  }
+
+  toString() {
+    return JSON.stringify(this.state, null, 4);
+  }
+
   static create(defaultState) {
     return new Store(defaultState);
   }
 
-  static get instance() {
+  static get() {
     return instance;
   }
 
   static get data() {
     return instance.state;
   }
-}
 
-let stateId = 0;
+  static ready(fn) {
+    if (instance) {
+      fn(instance);
+    } else {
+      readyHandlers.push(fn);
+    }
+  }
+}
 
 class StoreComponent extends React.Component {
   constructor(props) {
     super(props);
-    this._isMounted = false;
+    this._isMounted = true;
+    this.store = instance;
     this.state = {
       id: stateId++
     };
+    if (this.constructor.store) {
+      if (typeof this.constructor.store !== 'string' && !Array.isArray(this.constructor.store)) {
+        throw new Error('Store bindings must be either a String or Array');
+      }
+      let bindings = typeof this.constructor.store === 'string' ? [this.constructor.store] : this.constructor.store;
+      bindings.forEach(binding => {
+        let path, alias;
+        if (typeof binding === 'string') {
+          path = binding;
+          alias = binding.split('.').pop();
+        } else if (Array.isArray(binding) && binding.length === 2) {
+          path = binding[0];
+          alias = binding[1];
+        } else {
+          throw new Error('Invalid argument for store bind, String or Array required.');
+        }
+        instance.on(path, () => {
+          if (this._isMounted) {
+            this.setState({
+              id: stateId++
+            });
+          }
+        });
+        Object.defineProperty(this, alias, {
+          get: function () {
+            return instance.get(path);
+          },
+          set: function (value) {
+            return instance.set(path, value);
+          }
+        });
+      });
+    }
   }
 
   componentDidMount() {
@@ -140,57 +301,22 @@ class StoreComponent extends React.Component {
     this._isMounted = false;
   }
 
-  initStore(dataPath, listeners) {
-    this.store = instance;
-    this.dataPath = dataPath;
-    let stateUpdater = () => {
-      if (this._isMounted) {
-        this.setState({
-          data: dataPath ? instance.get(dataPath) : null
-        });
-      }
+  handler(path, value) {
+    return () => instance.set(path, value);
+  }
+
+  action(path, ...args) {
+    return () => {
+      this.do.call(this, path, ...args)
     };
-    this.state = {
-      data: dataPath ? instance.get(dataPath) : null
-    };
-    if (dataPath) {
-      instance.on(dataPath, stateUpdater);
-    }
-    if (listeners) {
-      listeners.forEach(path => instance.on(path, stateUpdater));
-    }
-  }
-
-  bind(path) {
-    instance.on(path, () => {
-      if (this._isMounted) {
-        this.setState({
-          id: stateId++
-        });
-      }
-    });
-  }
-
-  alias(path, alias) {
-    Object.defineProperty(this, alias, {
-      get: function () {
-        return instance.get(path);
-      }
-    });
-  }
-
-  get(path) {
-    return this.store.get(path);
-  }
-
-  set(path, value) {
-    this.store.set(path, value);
-  }
-
-  get data() {
-    return instance.get(this.dataPath);
   }
 }
+
+storeHelperAccessors.forEach(methodName => {
+  StoreComponent.prototype[methodName] = function () {
+    return instance[methodName].apply(instance, arguments);
+  }
+});
 
 Store.Component = StoreComponent;
 

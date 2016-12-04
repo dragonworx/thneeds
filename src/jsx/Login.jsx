@@ -1,31 +1,28 @@
 import React from 'react'
 import Store from '../store-lib'
-import axios from 'axios'
 
 class Login extends Store.Component {
-  constructor(props) {
-    super(props);
-    this.initStore('user');
-  }
-
   login(e) {
     const username = this.refs.username.value;
     const password = this.refs.password.value;
-    axios.post('/api/login', {
+    postJSON('/api/login', {
       username: username,
       password: password
     }).then(res => {
       let user = res.data;
       user.loginTime = new Date().getTime();
-      console.log('user:', user);
-      this.set('user', user);
+      this.user = user;
     }).catch((err) => {
+      // TODO: handle network error...
       debugger;
     });
     e.preventDefault();
   }
 
   render() {
+    if (this.route !== 'login') {
+      return null;
+    }
     return (
       <form className="login">
         <fieldset>
@@ -44,5 +41,7 @@ class Login extends Store.Component {
     );
   }
 }
+
+Login.store = ['route', 'user'];
 
 export default Login;
