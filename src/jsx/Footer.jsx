@@ -6,8 +6,8 @@ class Footer extends Store.Component {
     return (
       <footer>
         <h1>Footer</h1>
-        <button onClick={this.handler('route', 'settings')}>Settings</button>
-        <button onClick={this.handler('route', 'thneeds')}>Thneeds</button>
+        <button onClick={this.deferSet('route', 'settings')}>Settings</button>
+        <button onClick={this.deferSet('route', 'thneeds')}>Thneeds</button>
       </footer>
     );
   }

@@ -3,7 +3,7 @@ import Store from '../store-lib'
 
 class Spinner extends Store.Component {
   render() {
-    if (!this.isLoading) {
+    if (!this.visible) {
       return null;
     }
     return (
@@ -12,6 +12,6 @@ class Spinner extends Store.Component {
   }
 }
 
-Spinner.store = 'ui.isLoading';
+Spinner.store = [{path:'visible.spinner', alias:'visible'}];
 
 export default Spinner;

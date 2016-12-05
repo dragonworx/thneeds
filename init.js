@@ -17,6 +17,7 @@ database.init('postgres://postgres:admin@localhost:5433/postgres', {force:true})
       sortOrder: []
     });
   }).then(() => {
-    log.completed('Database init completed. Please wait while database finalises sync...');
+    log.completed('Database init completed.');
+    log.ok('Please wait while database finalises sync...');
   });
 });

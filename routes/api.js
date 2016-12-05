@@ -9,7 +9,13 @@ function logData(method, data) {
 }
 
 router.get('/init', (req, res) => {
-  db.tables.settings.findAll().then(settings => {
+  db.tables.settings.findOne({
+    where: {
+      id: 1
+    }
+  }).then(settings => {
+    settings.accountAmount = parseFloat(settings.accountAmount);
+    settings.budgetAmount = parseFloat(settings.budgetAmount);
     db.tables.thneed.findAll({
       where: {
         purchased: null
@@ -17,7 +23,7 @@ router.get('/init', (req, res) => {
       order: 'id'
     }).then(thneeds => {
       res.json({
-        settings: settings[0],
+        settings: settings,
         thneeds: thneeds
       });
     });
@@ -40,28 +46,19 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/saveSettings', (req, res) => {
-  const data = logData('saveSettings', {
-    accountDescription: req.body.accountDescription,
-    accountAmount: req.body.accountAmount,
-    budgetAmount: req.body.budgetAmount,
-    budgetFrequency: req.body.budgetFrequency,
-  });
-  db.tables.settings.findAll().then(settings => {
-    return settings[0].update(data).then(() => {
-      res.json({success:true});
-    });
+  const settings = logData('saveSettings', req.body);
+  db.tables.settings.update(settings, {
+    where: {
+      id: 1
+    }
+  }).then(() => {
+    res.json({success: true});
   });
 });
 
 router.post('/addThneed', (req, res) => {
-  const data = logData('addThneed', {
-    userId: req.body.userId,
-    title: req.body.title,
-    notes: req.body.notes,
-    label: req.body.label,
-    amount: req.body.amount
-  });
-  db.tables.thneed.create(data).then(thneed => {
+  const thneedData = logData('addThneed', req.body);
+  db.tables.thneed.create(thneedData).then(thneed => {
     res.json({
       err: null,
       thneed: thneed
@@ -74,18 +71,36 @@ router.post('/addThneed', (req, res) => {
   });
 });
 
-router.post('/saveThneeds', (req, res) => {
-  const data = logData('saveThneeds', req.body.thneeds);
-  Promise.all(data.map(function (thneed) {
-    return db.tables.thneed.update(thneed, {where:{id:thneed.id}});
-  })).then(() => {
-    res.json({success:true});
+function saveSortOrder(array) {
+  return db.tables.settings.update({
+    sortOrder: array
+  }, {
+    where: {
+      id: 1
+    }
+  });
+}
+
+router.post('/saveSortOrder', (req, res) => {
+  const array = logData('saveSortOrder', req.body);
+  saveSortOrder(array).then(() => {
+    res.json({success: true});
   });
 });
 
-router.post('/saveSortOrder', (req, res) => {
-  const data = logData('saveSortOrder', req.body.sortOrder);
-  db.tables.settings.update(data, {where:{id:1}}).then(() => res.json({success:true}));
+router.post('/deleteThneed', (req, res) => {
+  const data = logData('deleteThneed', req.body);
+  const id = data.id;
+  const sortOrder = data.sortOrder;
+  db.tables.thneed.destroy({
+    where: {
+      id: id
+    }
+  }).then(() => {
+    saveSortOrder(sortOrder).then(() => {
+      res.json({success: true});
+    });
+  })
 });
 
 module.exports = router;

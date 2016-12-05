@@ -5,7 +5,7 @@ import Format from '../../format.js'
 class Day extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this._state = {
     };
   }
 
@@ -24,11 +24,11 @@ class Day extends React.Component {
     let transactions = this.props.transactions;
     let date = this.props.date;
     let weekDay = this.props.weekDay;
-    let selectedDay = this.props.app.state.selectedDay;
+    let selectedDay = this.props.app._state.selectedDay;
     let enabled = this.props.enabled;
     let categories = {};
-    let searchText = this.props.app.state.searchText;
-    let searchMatches = this.props.app.state.searchMatches;
+    let searchText = this.props.app._state.searchText;
+    let searchMatches = this.props.app._state.searchMatches;
     let hasSearchMatch = false;
 
     // check for category color

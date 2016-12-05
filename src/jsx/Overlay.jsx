@@ -3,7 +3,7 @@ import Store from '../store-lib'
 
 class Overlay extends Store.Component {
   render() {
-    if (!this.showOverlay) {
+    if (!this.visible) {
       return null;
     }
     return (
@@ -14,6 +14,6 @@ class Overlay extends Store.Component {
   }
 }
 
-Overlay.store = 'ui.showOverlay';
+Overlay.store = [{path:'visible.overlay', alias:'visible'}];
 
 export default Overlay;

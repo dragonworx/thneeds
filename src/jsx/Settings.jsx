@@ -2,24 +2,6 @@ import React from 'react'
 import Store from '../store-lib'
 
 class Settings extends Store.Component {
-  save() {
-    this.settings.accountDescription = this.refs.accountDescription.value;
-    this.settings.accountAmount = this.refs.accountAmount.value;
-    this.settings.budgetAmount = this.refs.budgetAmount.value;
-    this.settings.budgetFrequency = this.refs.budgetFrequency.value;
-    postJSON('/api/saveSettings', this.settings).then(res => {
-      if (res.data.success) {
-        this.route = 'thneeds';
-      } else {
-        // TODO: handle error?
-      }
-    });
-  }
-
-  cancel() {
-    this.route = 'thneeds';
-  }
-
   render() {
     if (this.route !== 'settings') {
       return null;
@@ -46,8 +28,8 @@ class Settings extends Store.Component {
             </select>
           </p>
           <p>
-            <button onClick={this.save.bind(this)}>Save</button>
-            <button onClick={this.cancel.bind(this)}>Cancel</button>
+            <button onClick={() => this.do('settings.save', this.ref('accountDescription'), this.refNum('accountAmount'), this.refNum('budgetAmount'), this.ref('budgetFrequency'))}>Save</button>
+            <button onClick={this.deferSet('route', 'thneeds')}>Cancel</button>
           </p>
         </fieldset>
       </section>

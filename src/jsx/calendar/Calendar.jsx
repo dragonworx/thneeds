@@ -17,7 +17,7 @@ class Calendar extends React.Component {
       accountNames.push(key);
     }
 
-    this.state = {
+    this._state = {
       transactions: [],
       accountNames: accountNames
     };
@@ -113,13 +113,13 @@ class Calendar extends React.Component {
   render() {
     let months = [];
 
-    if (this.state.map) {
+    if (this._state.map) {
       let index = 0;
-      for (let [keyByYearMonth, mapByDay] of this.state.map.entries()) {
+      for (let [keyByYearMonth, mapByDay] of this._state.map.entries()) {
         let [year, month] = keyByYearMonth.split('.');
         year = parseInt(year, 10);
         month = parseInt(month, 10);
-        months.push(<Month app={this.props.app} year={year} month={month} transactions={mapByDay} key={keyByYearMonth} index={index} indexLength={this.state.map.size} />);
+        months.push(<Month app={this.props.app} year={year} month={month} transactions={mapByDay} key={keyByYearMonth} index={index} indexLength={this._state.map.size} />);
         index++;
       }
     }
@@ -130,8 +130,8 @@ class Calendar extends React.Component {
           <label>Account:
             <select ref="account"
                     onChange={() => localStorage['account'] = this.refs.account.value}
-                    defaultValue={localStorage['account'] ? localStorage['account'] : this.state.accountNames[0]}>
-              {this.state.accountNames.map((accountName) => <option value={accountName} key={'account_' + accountName}>{accountName}</option>)}
+                    defaultValue={localStorage['account'] ? localStorage['account'] : this._state.accountNames[0]}>
+              {this._state.accountNames.map((accountName) => <option value={accountName} key={'account_' + accountName}>{accountName}</option>)}
             </select>
           </label>
           <label>From:
@@ -149,7 +149,7 @@ class Calendar extends React.Component {
         <div className="data">
           <div className="options">
             Calendar
-            <Search app={this.props.app} transactions={this.state.map}></Search>
+            <Search app={this.props.app} transactions={this._state.map}></Search>
           </div>
           <div className="months">
             {months}

@@ -3,12 +3,12 @@ import Store from '../store-lib'
 
 class LabelPicker extends Store.Component {
   select(label) {
-    this.set('editThneed.thneed.label', label);
-    showLabelPicker(false);
+    this.set('edit.thneed.label', label);
+    this.do('labelPicker.hide');
   }
 
   render() {
-    if (!this.showLabelPicker) {
+    if (!this.labelPicker) {
       return null;
     }
     return (
@@ -21,6 +21,6 @@ class LabelPicker extends Store.Component {
   }
 }
 
-LabelPicker.store = 'ui.showLabelPicker';
+LabelPicker.store = 'visible.labelPicker';
 
 export default LabelPicker;

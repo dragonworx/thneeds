@@ -10,7 +10,7 @@ const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 class Month extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
+    this._state = {
       selectedDay: null
     };
   }
@@ -31,7 +31,7 @@ class Month extends React.Component {
   }
 
   render() {
-    let selectedMonth = this.props.app.state.selectedMonth;
+    let selectedMonth = this.props.app._state.selectedMonth;
 
     // header
     let year;
