@@ -58,7 +58,7 @@ footer {
   margin-right: 20px; }
 
 .thneed {
-  height: 50px; }
+  min-height: 50px; }
 
 #overlay {
   position: absolute;
@@ -85,6 +85,33 @@ footer {
   #labelPicker .label {
     height: 10%; }
 
+#test {
+  position: absolute;
+  top: 10%;
+  left: 20%;
+  right: 20%;
+  bottom: 10%;
+  color: red; }
+
+#purchase {
+  position: absolute;
+  top: 40%;
+  left: 20%;
+  right: 20%;
+  bottom: 40%;
+  border: 1px solid black;
+  background-color: #ccc; }
+
+.confirm-delete {
+  height: 50px;
+  text-align: right; }
+
+.confirm-delete.show {
+  display: block; }
+
+.confirm-delete.hide {
+  display: none; }
+
 .default {
   background-color: #2C2C2C; }
 
@@ -96,3 +123,7 @@ footer {
 
 .blue {
   background-color: #12208a; }
+
+.error-validation {
+  display: block;
+  color: red; }

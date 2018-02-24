@@ -1,30 +1,10 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 
-class Login extends Store.Component {
-  login(e) {
-    const username = this.refs.username.value;
-    const password = this.refs.password.value;
-    postJSON('/api/login', {
-      username: username,
-      password: password
-    }).then(res => {
-      let user = res.data;
-      user.loginTime = new Date().getTime();
-      this.user = user;
-    }).catch((err) => {
-      // TODO: handle network error...
-      debugger;
-    });
-    e.preventDefault();
-  }
-
+class Login extends Axial.Component {
   render() {
-    if (this.route !== 'login') {
-      return null;
-    }
     return (
-      <form className="login">
+      <Axial.Form when={this.route === 'login'} className="login">
         <fieldset>
           <legend>Login</legend>
           <p>
@@ -34,14 +14,14 @@ class Login extends Store.Component {
             <label>password: <input ref="password" type="password" defaultValue="snerf" /></label>
           </p>
           <p>
-            <button onClick={this.login.bind(this)}>Login</button>
+            <button onClick={() => this.call.login(this.ref('username'), this.ref('password'))}>Login</button>
           </p>
         </fieldset>
-      </form>
+      </Axial.Form>
     );
   }
 }
 
-Login.store = ['route', 'user'];
+Login.bind('route', 'user');
 
 export default Login;

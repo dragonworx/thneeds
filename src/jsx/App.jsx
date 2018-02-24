@@ -1,19 +1,21 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 import Login from './Login.jsx'
 import Layout from './Layout.jsx'
 import Overlay from './Overlay.jsx'
 import Spinner from './Spinner.jsx'
 import LabelPicker from './LabelPicker.jsx'
+import Purchase from './Purchase.jsx'
 
-class App extends Store.Component {
+class App extends Axial.Component {
   render() {
     return (
-      <div id="app">
+      <div id="foo">
         <Login />
         <Layout />
         <Overlay>
           <LabelPicker />
+          <Purchase />
           <Spinner />
         </Overlay>
       </div>
@@ -21,6 +23,6 @@ class App extends Store.Component {
   }
 }
 
-App.store = 'route';
+App.bind('route');
 
 export default App;

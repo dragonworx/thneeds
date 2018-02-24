@@ -1,19 +1,16 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 
-class Overlay extends Store.Component {
+class Overlay extends Axial.Component {
   render() {
-    if (!this.visible) {
-      return null;
-    }
     return (
-      <div id="overlay">
+      <Axial.Div when={this.visible} id="overlay" onClick={() => this.call.overlay.hide()}>
         {this.props.children}
-      </div>
+      </Axial.Div>
     );
   }
 }
 
-Overlay.store = [{path:'visible.overlay', alias:'visible'}];
+Overlay.bind({path: 'visible.overlay', alias: 'visible'});
 
 export default Overlay;

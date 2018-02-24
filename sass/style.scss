@@ -54,7 +54,7 @@ footer {
 }
 
 .thneed {
-  height: 50px;
+  min-height: 50px;
 }
 
 #overlay {
@@ -79,6 +79,30 @@ footer {
   }
 }
 
+#test {
+  @include dialog(20%, 10%);
+  color: red;
+}
+
+#purchase {
+  @include dialog(20%, 40%);
+  border: 1px solid black;
+  background-color: #ccc;
+}
+
+.confirm-delete {
+  height: 50px;
+  text-align: right;
+}
+
+.confirm-delete.show {
+  display: block;
+}
+
+.confirm-delete.hide {
+  display: none;
+}
+
 .default {
   background-color: #2C2C2C;
 }
@@ -93,4 +117,9 @@ footer {
 
 .blue {
   background-color: #12208a;
+}
+
+.error-validation {
+  display: block;
+  color: red;
 }

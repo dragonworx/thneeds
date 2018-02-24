@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "../node_modules/.bin/gulp"
+    "test": "/Users/achamas/Dropbox/srv/node_modules/.bin/mocha",
+    "start": "/Users/achamas/Dropbox/srv/node_modules/.bin/gulp",
+    "test-dev": "/Users/achamas/Dropbox/srv/node_modules/.bin/gulp test"
+  },
+  "dependencies": {
+    "react-axial": "*"
   }
 }

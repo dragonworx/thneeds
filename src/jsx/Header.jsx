@@ -1,17 +1,31 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 
-class Header extends Store.Component {
+class Header extends Axial.Component {
   render() {
     return (
       <header>
         <h1>Header</h1>
-        <button onClick={this.action('thneed.add')}>Add Thneed</button>
+        <p>{this.test}</p>
+        <Axial.Button when={this.route === 'thneeds'} onClick={() => this.call.thneed.add()}>Add Thneed</Axial.Button>
+        <button onClick={() => this.test = '123'}>Test</button>
       </header>
     );
   }
 }
 
-Header.store = 'route';
+Header.bind(
+  'route',
+  'user.id',
+  {
+    alias: 'test',
+    get: function () {
+      return '#' + this.get('user.id')
+    },
+    set: function (value) {
+      this.set('user.id', value);
+    }
+  }
+);
 
 export default Header;

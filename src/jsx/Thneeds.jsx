@@ -1,23 +1,20 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 import Thneed from './Thneed.jsx'
 
-class Thneeds extends Store.Component {
+class Thneeds extends Axial.Component {
   render() {
-    if (this.route !== 'thneeds') {
-      return null;
-    }
     return (
-      <section id="thneeds">
+      <Axial.Section when={this.route === 'thneeds'} id="thneeds">
         <h1>Thneeds</h1>
         <div className="thneed-list">
           {this.thneeds.map(thneed => <Thneed key={`thneed${thneed.id}`} thneed={thneed}></Thneed>)}
         </div>
-      </section>
+      </Axial.Section>
     );
   }
 }
 
-Thneeds.store = ['route', 'thneeds'];
+Thneeds.bind('route', 'thneeds');
 
 export default Thneeds;

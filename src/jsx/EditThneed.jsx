@@ -1,35 +1,33 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 
-class EditThneed extends Store.Component {
+class EditThneed extends Axial.Component {
   render() {
-    if (this.route !== 'edit' || !this.edit.thneed) {
-      return null;
-    }
     return (
-      <div id="editThneed">
+      <Axial.Div when={this.route === 'edit' && this.edit.thneed} id="editThneed">
         <h1>Edit {this.edit.isNew ? 'New' : 'Existing'} Thneed</h1>
         <p>
-          <label>Title:</label> <input ref="title" type="text" defaultValue={this.edit.thneed.title} />
+          <label>Title:</label> <input ref="title" type="text" defaultValue={this.title} />
         </p>
         <p>
-          <label>Amount:</label> <input ref="amount" type="text" defaultValue={this.edit.thneed.amount} />
+          <label>Amount:</label> <input ref="amount" type="text" defaultValue={this.amount} />
+          <Axial.Span when={this.errors.thneedAmount} className="error-validation">Must be a currency value</Axial.Span>
         </p>
         <p>
-          <label>Notes:</label> <input ref="notes" type="text" defaultValue={this.edit.thneed.notes} />
+          <label>Notes:</label> <input ref="notes" type="text" defaultValue={this.notes} />
         </p>
         <p>
-          <button id="labelEdit" className={this.edit.thneed.label} onClick={this.action('labelPicker.show')}></button>
+          <button id="labelEdit" className={this.label} onClick={() => this.call.labelPicker.show()}></button>
         </p>
         <p>
-          <button onClick={() => this.do('thneed.edit.save', this.ref('title'), this.ref('amount'), this.ref('notes'), this.get('edit.thneed.label'))}>Save</button>
-          <button onClick={this.action('thneed.edit.cancel')}>Cancel</button>
+          <button onClick={() => this.call.thneed.edit.save(this.ref('title'), this.refNum('amount'), this.ref('notes'), this.get('edit.thneed.label'))}>Save</button>
+          <button onClick={() => this.call.thneed.edit.cancel()}>Cancel</button>
         </p>
-      </div>
+      </Axial.Div>
     );
   }
 }
 
-EditThneed.store = ['route', 'edit'];
+EditThneed.bind('route', 'edit', 'edit.thneed.title', 'edit.thneed.amount', 'edit.thneed.notes', 'edit.thneed.label', 'errors');
 
 export default EditThneed;

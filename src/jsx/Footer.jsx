@@ -1,18 +1,22 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 
-class Footer extends Store.Component {
+class Footer extends Axial.Component {
   render() {
     return (
       <footer>
         <h1>Footer</h1>
-        <button onClick={this.deferSet('route', 'settings')}>Settings</button>
-        <button onClick={this.deferSet('route', 'thneeds')}>Thneeds</button>
+        {
+          this.get('user.isAdmin')
+          ? <Axial.Button when={this.route !== 'settings'} onClick={() => this.route = 'settings'}>Settings</Axial.Button>
+            : null
+        }
+        <Axial.Button when={this.route !== 'thneeds'} onClick={() => this.route = 'thneeds'}>Thneeds</Axial.Button>
       </footer>
     );
   }
 }
 
-Footer.store = 'route';
+Footer.bind('route');
 
 export default Footer;

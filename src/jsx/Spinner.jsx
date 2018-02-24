@@ -1,17 +1,14 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 
-class Spinner extends Store.Component {
+class Spinner extends Axial.Component {
   render() {
-    if (!this.visible) {
-      return null;
-    }
     return (
-      <div id="spinner">Loading...</div>
+      <Axial.Div when={this.visible} id="spinner">Loading...</Axial.Div>
     );
   }
 }
 
-Spinner.store = [{path:'visible.spinner', alias:'visible'}];
+Spinner.bind({path: 'visible.spinner', alias: 'visible'});
 
 export default Spinner;

@@ -1,17 +1,17 @@
 import axios from 'axios'
 
-module.exports = {
+export default {
   get: function () {
-    this.do('spinner.show');
+    this.call.spinner.show();
     return axios.get.apply(axios, arguments).then((res) => {
-      this.do('spinner.hide');
+      this.call.spinner.hide();
       return res;
     });
   },
   post: function () {
-    this.do('spinner.show');
+    this.call.spinner.show();
     return axios.post.apply(axios, arguments).then((res) => {
-      this.do('spinner.hide');
+      this.call.spinner.hide();
       return res;
     });
   }

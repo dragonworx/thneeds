@@ -1,26 +1,20 @@
 import React from 'react'
-import Store from '../store-lib'
+import Axial from 'react-axial'
 
-class LabelPicker extends Store.Component {
-  select(label) {
-    this.set('edit.thneed.label', label);
-    this.do('labelPicker.hide');
-  }
-
+class LabelPicker extends Axial.Component {
   render() {
-    if (!this.labelPicker) {
-      return null;
-    }
     return (
-      <div id="labelPicker">
+      <Axial.Div when={this.visible} id="labelPicker">
         {
-          ['default', 'red', 'green', 'blue'].map(label => <div key={`label${label}`} className={`label ${label}`} onClick={this.select.bind(this, label)}></div>)
+          ['default', 'red', 'green', 'blue'].map(label => {
+            return <div key={`label${label}`} className={`label ${label}`} onClick={() => this.call.labelPicker.select(label)}></div>
+          })
         }
-      </div>
+      </Axial.Div>
     );
   }
 }
 
-LabelPicker.store = 'visible.labelPicker';
+LabelPicker.bind({path: 'visible.labelPicker', alias: 'visible'});
 
 export default LabelPicker;

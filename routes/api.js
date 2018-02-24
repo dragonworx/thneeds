@@ -1,11 +1,22 @@
 const express = require('express');
-const router = express.Router();
 const log = require('../log.js');
 const db = require('../database');
+
+const router = express.Router();
 
 function logData(method, data) {
   log.info(method + ': ' + JSON.stringify(data, null, 4));
   return data;
+}
+
+function saveSortOrder(array) {
+  return db.tables.settings.update({
+    sortOrder: array
+  }, {
+    where: {
+      id: 1
+    }
+  });
 }
 
 router.get('/init', (req, res) => {
@@ -71,16 +82,6 @@ router.post('/addThneed', (req, res) => {
   });
 });
 
-function saveSortOrder(array) {
-  return db.tables.settings.update({
-    sortOrder: array
-  }, {
-    where: {
-      id: 1
-    }
-  });
-}
-
 router.post('/saveSortOrder', (req, res) => {
   const array = logData('saveSortOrder', req.body);
   saveSortOrder(array).then(() => {
@@ -101,6 +102,34 @@ router.post('/deleteThneed', (req, res) => {
       res.json({success: true});
     });
   })
+});
+
+router.post('/saveThneed', (req, res) => {
+  const data = logData('saveThneed', req.body);
+  const id = data.id;
+  const thneed = data.thneed;
+  db.tables.thneed.update(thneed, {
+    where: {
+      id: id
+    }
+  }).then(() => {
+    res.json({success: true});
+  });
+});
+
+router.post('/purchaseThneed', (req, res) => {
+  const data = logData('saveThneed', req.body);
+  const id = data.id;
+  const sortOrder = data.sortOrder;
+  db.tables.thneed.update({purchased: new Date()}, {
+    where: {
+      id: id
+    }
+  }).then(() => {
+    saveSortOrder(sortOrder).then(() => {
+      res.json({success: true});
+    });
+  });
 });
 
 module.exports = router;

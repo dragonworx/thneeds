@@ -56,6 +56,10 @@ module.exports = {
           type: SQL.TEXT,
           defaultValue: 'weekly'
         },
+        budgetOccurence: {
+          type: SQL.TEXT,
+          defaultValue: 'start'
+        },
         accountDescription: {
           type: SQL.TEXT
         },

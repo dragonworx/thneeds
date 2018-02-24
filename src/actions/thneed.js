@@ -14,35 +14,68 @@ module.exports = {
     });
   },
   edit: {
+    open: function (thneed) {
+      this.set({
+        edit: {
+          isNew: false,
+          thneed: thneed
+        },
+        route: 'edit'
+      });
+    },
     save: function (title, amount, notes, label, userId) {
-      this.do('json.post', '/api/addThneed', {
-        title: title,
-        amount: amount,
-        notes: notes,
-        label: label,
-        userId: userId
-      }).then(res => {
-        if (res.data.err) {
-          // TODO: display validation error
-          res.err.errors.forEach(err => {
-            const message = err.message;
-            const path = err.path;
+      if (this.call.validation.validateNumber(amount, 'thneedAmount')) {
+        const thneedData = {
+          title: title,
+          amount: amount,
+          notes: notes,
+          label: label,
+          userId: userId
+        };
+        if (this.get('edit.isNew')) {
+          this.call.json.post('/api/addThneed', thneedData).then(res => {
+            if (res.data.err) {
+              // TODO: display validation error
+              res.err.errors.forEach(err => {
+                const message = err.message;
+                const path = err.path;
+              });
+            } else {
+              this
+                .add('thneeds', res.data.thneed)
+                .set({
+                  edit: {
+                    thneed: null
+                  },
+                  route: 'thneeds'
+                })
+                .call.settings.saveSortOrder();
+            }
+          }).catch(res => {
+            // TODO: handle network error...
+            debugger;
           });
         } else {
-          this
-            .add('thneeds', res.data.thneed)
-            .set({
-              edit: {
-                thneed: null
-              },
-              route: 'thneeds'
-            })
-            .do('settings.saveSortOrder');
+          this.call.json.post('/api/saveThneed', {
+            id: this.get('edit.thneed.id'),
+            thneed: thneedData
+          }).then(res => {
+            if (res.data.success) {
+              let thneed = this.get('edit.thneed');
+              thneed.title = title;
+              thneed.amount = amount;
+              thneed.notes = notes;
+              thneed.label = label;
+              this.set({
+                edit: {
+                  thneed: null
+                },
+                route: 'thneeds'
+              });
+            }
+          });
         }
-      }).catch(res => {
-        // TODO: handle network error...
-        debugger;
-      });
+      }
     },
     cancel: function () {
       this.set({
@@ -63,7 +96,7 @@ module.exports = {
     thneeds.splice(index - 1, 0, thneed);
     this
       .set('thneeds', thneeds)
-      .do('settings.saveSortOrder');
+      .call.settings.saveSortOrder();
   },
   moveDown: function (thneed) {
     let thneeds = this.get('thneeds');
@@ -75,19 +108,62 @@ module.exports = {
     thneeds.splice(index + 1, 0, thneed);
     this
       .set('thneeds', thneeds)
-      .do('settings.saveSortOrder');
+      .call.settings.saveSortOrder();
+  },
+  confirmDelete: function (thneed) {
+    this.set('deleteThneed', thneed);
+  },
+  applyConfirmDelete: function () {
+    this.call.thneed.delete(this.get('deleteThneed'));
+    this.set('deleteThneed', null);
+  },
+  cancelConfirmDelete: function () {
+    this.set('deleteThneed', null);
   },
   delete: function (thneed) {
     let thneeds = this.get('thneeds');
     const index = thneeds.indexOf(thneed);
     thneeds.splice(index, 1);
-    this.do('json.post', '/api/deleteThneed', {
+    this.call.json.post('/api/deleteThneed', {
       id: thneed.id,
-      sortOrder: this.do('settings.getSortOrder')
-    }).then((res) => {
+      sortOrder: this.call.settings.getSortOrder()
+    }).then(res => {
       if (res.data.success) {
         this.set('thneeds', thneeds);
       }
     })
+  },
+  showPurchase: function (thneed) {
+    this.set({
+      purchaseThneed: thneed,
+      visible: {
+        overlay: true,
+        purchase: true
+      }
+    });
+  },
+  closePurchase: function () {
+    this.set({
+      purchaseThneed: null,
+      visible: {
+        overlay: false,
+        purchase: false
+      }
+    });
+  },
+  confirmPurchase: function () {
+    let thneeds = this.get('thneeds');
+    const thneed = this.get('purchaseThneed');
+    const index = thneeds.indexOf(thneed);
+    thneeds.splice(index, 1);
+    this.call.json.post('/api/purchaseThneed', {
+      id: thneed.id,
+      sortOrder: this.call.settings.getSortOrder()
+    }).then(res => {
+      if (res.data.success) {
+        this.call.thneed.closePurchase();
+        this.set('thneeds', thneeds);
+      }
+    });
   }
 };

@@ -14,5 +14,10 @@ module.exports = {
         overlay: false
       }
     });
+  },
+  select: function (label) {
+    this
+      .set('edit.thneed.label', label)
+      .call.labelPicker.hide();
   }
 };

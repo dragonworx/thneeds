@@ -46,10 +46,13 @@ app.use(function(err, req, res, next) {
   log.error(err.status === 404 ? err.message : err.stack);
 });
 
-db.init().then(function () {
-  log.info('database initialised.');
-  app.listen(3000);
-  log.begin('http://thneeds.musicartscience.com.au:3000');
-});
+//db.init().then(function () {
+//  log.info('database initialised.');
+//  app.listen(3000);
+//  log.begin('http://thneeds.musicartscience.com.au:3000');
+//});
+
+app.listen(3000);
+log.begin('http://thneeds.musicartscience.com.au:3000');
 
 module.exports = app;
